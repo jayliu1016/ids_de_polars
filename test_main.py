@@ -1,81 +1,55 @@
 import unittest
 import polars as pl
 import os
+from main import (
+    load_dataset,
+    generate_summary_statistics,
+    group_by,
+    build_histogram,
+    save_to_markdown,
+    print_head,
+)
 
 
-class TestPolarsDescriptiveStats(unittest.TestCase):
+class TestPolarsFunctions(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # This method runs once before any test
-        cls.file_path = (
-            "/Users/liuliangcheng/Desktop/Duke/ids_de_polars/player_overview.csv"
-        )
-        cls.df = pl.read_csv(cls.file_path)
+        cls.dataset_path = "player_overview.csv"
+        cls.df = load_dataset(cls.dataset_path)
 
-    def test_data_loading(self):
-        """Test if the CSV file is loaded correctly"""
-        self.assertIsNotNone(self.df, "DataFrame is None")
-        self.assertGreater(self.df.height, 0, "DataFrame is empty")
+    def test_load_dataset(self):
+        """Test if dataset loads correctly."""
+        self.assertIsNotNone(self.df)
+        self.assertGreater(self.df.height, 0, "Dataframe is empty")
+
+    def test_print_head(self):
+        """Test if the head of the dataframe prints correctly."""
+        head = print_head(self.df)
+        self.assertEqual(len(head), 5, "Head does not return 5 rows")
 
     def test_summary_statistics(self):
-        """Test if summary statistics are calculated correctly"""
-        summary_stats = self.df.select(
-            [
-                pl.col(column).mean().alias(f"{column}_mean")
-                for column, dtype in self.df.schema.items()
-                if dtype in [pl.Float64, pl.Int64]
-            ]
-            + [
-                pl.col(column).median().alias(f"{column}_median")
-                for column, dtype in self.df.schema.items()
-                if dtype in [pl.Float64, pl.Int64]
-            ]
-            + [
-                pl.col(column).std().alias(f"{column}_std")
-                for column, dtype in self.df.schema.items()
-                if dtype in [pl.Float64, pl.Int64]
-            ]
-        )
+        """Test if summary statistics are generated correctly."""
+        summary_stats = generate_summary_statistics(self.df)
+        self.assertGreater(summary_stats.width, 0, "Summary statistics are empty")
 
-        # Check if summary statistics DataFrame has data
-        self.assertGreater(summary_stats.height, 0, "Summary statistics are empty")
-        self.assertGreaterEqual(
-            summary_stats.width,
-            6,
-            "Summary statistics does not contain expected number of columns",
-        )
+    def test_group_by(self):
+        """Test if group_by function works for categorical columns."""
+        group_result = group_by(self.df, "Position")
+        self.assertGreater(len(group_result), 0, "Group by returned empty result")
 
-    def test_csv_output(self):
-        """Test if the CSV file with summary statistics is created"""
-        summary_stats = self.df.select(
-            [
-                pl.col(column).mean().alias(f"{column}_mean")
-                for column, dtype in self.df.schema.items()
-                if dtype in [pl.Float64, pl.Int64]
-            ]
-            + [
-                pl.col(column).median().alias(f"{column}_median")
-                for column, dtype in self.df.schema.items()
-                if dtype in [pl.Float64, pl.Int64]
-            ]
-            + [
-                pl.col(column).std().alias(f"{column}_std")
-                for column, dtype in self.df.schema.items()
-                if dtype in [pl.Float64, pl.Int64]
-            ]
-        )
-        # Write the statistics to a CSV file
-        summary_stats.write_csv("test_summary_statistics.csv")
+    def test_build_histogram(self):
+        """Test if the histogram is created and saved."""
+        build_histogram(self.df, "Goals", "test_goals_histogram.png")
+        self.assertTrue(os.path.exists("test_goals_histogram.png"))
+        os.remove("test_goals_histogram.png")
 
-        # Test if the file was created
-        self.assertTrue(
-            os.path.exists("test_summary_statistics.csv"),
-            "Summary statistics CSV file was not created",
-        )
-
-        # Optionally, clean up the file after test
-        os.remove("test_summary_statistics.csv")
+    def test_save_to_markdown(self):
+        """Test if summary statistics are saved to markdown."""
+        summary_stats = generate_summary_statistics(self.df)
+        save_to_markdown(summary_stats, "test_player_summary.md")
+        self.assertTrue(os.path.exists("test_player_summary.md"))
+        os.remove("test_player_summary.md")
 
 
 if __name__ == "__main__":
