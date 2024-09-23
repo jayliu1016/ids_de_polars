@@ -5,7 +5,7 @@ from main import (
     load_dataset,
     generate_summary_statistics,
     group_by,
-    build_histogram,
+    build_log_histogram,
     save_to_markdown,
     print_head,
 )
@@ -15,6 +15,7 @@ class TestPolarsFunctions(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # Load the dataset once before running the tests
         cls.dataset_path = "player_overview.csv"
         cls.df = load_dataset(cls.dataset_path)
 
@@ -38,18 +39,31 @@ class TestPolarsFunctions(unittest.TestCase):
         group_result = group_by(self.df, "Position")
         self.assertGreater(len(group_result), 0, "Group by returned empty result")
 
-    def test_build_histogram(self):
-        """Test if the histogram is created and saved."""
-        build_histogram(self.df, "Goals", "test_goals_histogram.png")
-        self.assertTrue(os.path.exists("test_goals_histogram.png"))
-        os.remove("test_goals_histogram.png")
+    def test_build_log_histogram(self):
+        """Test if the log histogram is created and saved."""
+        output_file = "test_goals_log_histogram.png"
+        build_log_histogram(self.df, "Goals", output_file)
+
+        # Check if the file was created
+        self.assertTrue(
+            os.path.exists(output_file),
+            "Logarithmic histogram image file was not created",
+        )
+
+        # Clean up the file after test
+        os.remove(output_file)
 
     def test_save_to_markdown(self):
         """Test if summary statistics are saved to markdown."""
         summary_stats = generate_summary_statistics(self.df)
-        save_to_markdown(summary_stats, "test_player_summary.md")
-        self.assertTrue(os.path.exists("test_player_summary.md"))
-        os.remove("test_player_summary.md")
+        output_file = "test_player_summary.md"
+        save_to_markdown(summary_stats, output_file)
+
+        # Check if the markdown file was created
+        self.assertTrue(os.path.exists(output_file), "Markdown file was not created")
+
+        # Clean up the markdown file after test
+        os.remove(output_file)
 
 
 if __name__ == "__main__":
