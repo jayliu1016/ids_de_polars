@@ -1,5 +1,6 @@
 import polars as pl
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 # Load dataset from csv file using Polars
@@ -68,19 +69,28 @@ def group_by(df, column_name):
     return df.select(pl.col(column_name).value_counts())
 
 
-# Create a histogram for a given numeric column
-def build_histogram(df, column_name, output_file):
+# Create a logarithmic histogram for a given numeric column
+def build_log_histogram(df, column_name, output_file):
     """
-    Creates a histogram for a specified numeric column.
+    Creates a logarithmic histogram for a specified numeric column.
 
     :param df: Polars DataFrame
     :param column_name: str, column to build histogram for
     :param output_file: str, path to save the histogram image
     """
-    plt.hist(df[column_name].to_numpy(), bins=20, edgecolor="white")
+    column_data = df[column_name].to_numpy()
+
+    # Create the histogram with a logarithmic scale on the x-axis
+    plt.hist(
+        column_data, bins=10, edgecolor="white", log=True
+    )  # Use log scale for y-axis
+
+    # Set labels and title
     plt.xlabel(column_name)
-    plt.ylabel("Frequency")
-    plt.title(f"{column_name} Histogram")
+    plt.ylabel("Frequency (Log Scale)")
+    plt.title(f"{column_name} Logarithmic Histogram")
+
+    # Save and show the plot
     plt.savefig(output_file)
     plt.show()
 
@@ -117,7 +127,7 @@ def main():
         print(group_by(dataframe, "Nationality"))
 
         # Build and save histogram for "Goals"
-        build_histogram(dataframe, "Goals", "goals_histogram.png")
+        build_log_histogram(dataframe, "Goals", "goals_log_histogram.png")
 
         # Save the summary statistics to markdown
         save_to_markdown(summary_stats, "player_summary.md")
