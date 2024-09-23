@@ -31,6 +31,9 @@ Profiler Comparison
 Performance comparisons between Polars and other Python libraries (like Pandas) can also be profiled to highlight the efficiency of Polars in handling large datasets.
 <img width="585" alt="Screenshot 2024-09-22 at 10 30 02 PM 2" src="https://github.com/user-attachments/assets/30c3a400-68b7-4c40-9edb-5fe1bbbcae65">
 
+summary stats
+<img width="564" alt="Screenshot 2024-09-22 at 10 40 23 PM" src="https://github.com/user-attachments/assets/b1c26eb1-a0a0-42c4-83d1-cce6cd82dcd7">
+
 CI/CD Integration
 This project uses GitHub Actions to automate key tasks:
 
