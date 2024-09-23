@@ -1,6 +1,6 @@
 [![Python Application Test with Github Actions - Polars](https://github.com/jayliu1016/ids_de_polars/actions/workflows/cicd.yml/badge.svg)](https://github.com/jayliu1016/ids_de_polars/actions/workflows/cicd.yml)
 # ids_de_polars
-verview
+overview
 This project is part of IDS706, Week 3 assignment, which focuses on analyzing a dataset of soccer player statistics using the Polars library. The project involves generating descriptive statistics and visualizations for the dataset, as well as utilizing continuous integration and continuous deployment (CI/CD) with GitHub Actions.
 
 The dataset contains information such as player names, nationalities, appearances, goals, assists, and clean sheets, among others. This project demonstrates how to summarize key statistics, visualize distributions, and automate these tasks through CI/CD pipelines.
